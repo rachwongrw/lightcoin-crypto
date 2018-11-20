@@ -1,9 +1,17 @@
-let balance = 500.00;
-
 class Account {
   constructor(username) {
     this.username = username;
-    this.balance = 0; // makes sense to start balance at 0.
+    this.transactions = [];
+  }
+  get balance() { // Calculate the balance using the transaction objects
+    var balance = 0;
+    for (let t of this.transactions) {
+      balance += t.value;
+    }
+    return balance;
+  }
+  addTransaction(transaction) {
+    this.transactions.push(transaction);
   }
 }
 
@@ -13,7 +21,8 @@ class Transaction {
     this.account = account;
   }
   commit() {
-    this.account.balance += this.value;
+    this.time = new Date();
+    this.account.addTransaction(this);
   }
 }
 
@@ -45,6 +54,7 @@ t2.commit();
 
 console.log('Closing Balance:', myAccount.balance);
 
+console.log('Transactions', myAccount.transactions);
 
 // t1 = new Withdrawal(50.25, myAccount); // passing myAccount into this object is Dependency Injection!
 // t1.commit();
