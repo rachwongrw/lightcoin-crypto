@@ -21,6 +21,10 @@ class Transaction {
     this.account = account;
   }
   commit() {
+    if (this.isAllowed() === false) {
+      console.log (`Transaction Denied`);
+      return;
+    }
     this.time = new Date();
     this.account.addTransaction(this);
   }
@@ -30,11 +34,20 @@ class Withdrawal extends Transaction {
   get value() {
     return -this.amount;
   }
+  isAllowed() {
+    if ((this.account.balance - this.amount) < 0) {
+      return false;
+    }
+    return true;
+  }
 }
 
 class Deposit extends Transaction {
   get value() {
     return this.amount;
+  }
+  isAllowed() {
+    return true;
   }
 }
 
@@ -46,26 +59,15 @@ const myAccount = new Account('crypto');
 
 console.log('Starting Balance:', myAccount.balance);
 
-const t1 = new Deposit(120.00, myAccount);
+const t1 = new Deposit(120.00, myAccount); // passing myAccount into this object is Dependency Injection!
 t1.commit();
 
 const t2 = new Withdrawal(50.00, myAccount);
 t2.commit();
 
+const t3 = new Withdrawal(80.00, myAccount); // Testing negative withdrawal
+t3.commit();
+
 console.log('Closing Balance:', myAccount.balance);
 
 console.log('Transactions', myAccount.transactions);
-
-// t1 = new Withdrawal(50.25, myAccount); // passing myAccount into this object is Dependency Injection!
-// t1.commit();
-// console.log('Transaction 1:', t1);
-
-// t2 = new Withdrawal(9.99, myAccount);
-// t2.commit();
-// console.log('Transaction 2:', t2);
-
-// t3 = new Deposit(120.00, myAccount);
-// t3.commit();
-// console.log('Transaction 3:', t3);
-
-// console.log('Balance:', myAccount.balance);
